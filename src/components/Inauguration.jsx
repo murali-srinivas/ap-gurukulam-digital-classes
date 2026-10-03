@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 export default function Inauguration() {
+  const [searchParams] = useSearchParams();
+  const showCurtain = searchParams.has('showCurtain');
+
+  if (!showCurtain) return null;
+
   const [isOpen, setIsOpen] = useState(false);
   const stageRef = useRef(null);
   const canvasRef = useRef(null);
