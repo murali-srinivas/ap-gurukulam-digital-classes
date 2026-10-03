@@ -12,11 +12,12 @@ const getChapters = (videos) => ['All', ...Array.from(new Set(videos.map(v => v.
 
 /* ── Dropdown Nav config ── */
 const navConfig = [
-  { label: 'Home',        path: '/',            chapters: [] },
-  { label: 'Mathematics', path: '/mathematics', chapters: getChapters(mathVideos) },
-  { label: 'Phy Science', path: '/physics',     chapters: getChapters(physicsVideos) },
-  { label: 'Bio Science', path: '/biology',     chapters: [] },
-  { label: 'Social',      path: '/social',      chapters: getChapters(socialVideos) },
+  { label: 'Home',               path: '/',            chapters: [] },
+  { label: 'Mathematics',        path: '/mathematics', chapters: getChapters(mathVideos) },
+  { label: 'Phy Science',        path: '/physics',     chapters: getChapters(physicsVideos) },
+  { label: 'Bio Science',        path: '/biology',     chapters: [] },
+  { label: 'Social',             path: '/social',      chapters: getChapters(socialVideos) },
+  { label: 'Gurukulam Magazine', path: '/magazine',    chapters: [] },
 ];
 
 /* ── Nav with dropdowns ── */
@@ -345,6 +346,64 @@ function Placeholder({ name }) {
   );
 }
 
+/* ── Gurukulam Magazine ── */
+function GurukulamMagazine() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 16px', minHeight: '80vh' }}>
+      <section className="pagehead" style={{ marginBottom: '24px', width: '100%', maxWidth: '960px' }}>
+        <span>APTWEI SOCIETY</span>
+        <h1>📰 GURUKULAM MAGAZINE</h1>
+        <p>Monthly publication featuring student achievements, academic articles &amp; school events</p>
+      </section>
+
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+        <a
+          href="/gurukulam-magazine.pdf"
+          target="_blank"
+          rel="noreferrer"
+          style={{
+            padding: '10px 22px', borderRadius: '999px',
+            background: '#8d005f', color: '#fff',
+            textDecoration: 'none', fontWeight: '700', fontSize: '14px',
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            boxShadow: '0 4px 14px rgba(141,0,95,0.35)'
+          }}
+        >
+          ↗ Open in New Tab
+        </a>
+        <a
+          href="/gurukulam-magazine.pdf"
+          download="Gurukulam-Magazine.pdf"
+          style={{
+            padding: '10px 22px', borderRadius: '999px',
+            background: 'rgba(255,255,255,0.1)', color: '#fff',
+            textDecoration: 'none', fontWeight: '700', fontSize: '14px',
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            border: '1px solid rgba(255,255,255,0.25)',
+            boxShadow: '0 4px 14px rgba(0,0,0,0.15)'
+          }}
+        >
+          ⬇ Download PDF
+        </a>
+      </div>
+
+      <div style={{
+        width: '100%', maxWidth: '960px', borderRadius: '16px',
+        overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
+        border: '1px solid rgba(255,255,255,0.12)', background: '#1a1a2e'
+      }}>
+        <iframe
+          src="/gurukulam-magazine.pdf"
+          title="Gurukulam Magazine"
+          width="100%"
+          height="820px"
+          style={{ display: 'block', border: 'none' }}
+        />
+      </div>
+    </div>
+  );
+}
+
 /* ── App / Router ── */
 function App() {
   const loc = useLocation();
@@ -371,6 +430,8 @@ function App() {
     content = <SocialStudies />;
   } else if (p === '/biology' || p === '/biological-science') {
     content = <Placeholder name="Biological Science" />;
+  } else if (p === '/magazine') {
+    content = <GurukulamMagazine />;
   } else {
     content = <Placeholder name="Social Studies" />;
   }
