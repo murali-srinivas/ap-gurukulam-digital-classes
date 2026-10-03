@@ -1,0 +1,261 @@
+:root{font-family:Inter,Segoe UI,Arial,sans-serif;color:#201a18;background:#3f2a25}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#725047,#3f2a25 65%);min-height:100vh}.site{max-width:1200px;margin:28px auto;background:#fffaf1;min-height:calc(100vh - 56px);box-shadow:0 18px 55px #0005}header{background:linear-gradient(135deg,#9f7f27,#d0b85f);padding:30px 34px}.brand{border:0;background:none;color:#fff;font:700 clamp(27px,4vw,46px) Georgia,serif;text-shadow:1px 2px 3px #0004;cursor:pointer;text-align:left;padding:0}nav{display:flex;flex-wrap:wrap;background:#fffaf1;border-bottom:1px solid #e6dacb;padding-left:18px}nav button{border:0;border-right:1px solid #e6dacb;background:transparent;padding:15px 22px;color:#806f5e;font:600 16px Georgia,serif;cursor:pointer}nav button:hover,nav button.active{background:#f1e7d8;color:#241b16}main{padding:38px 34px 55px;min-height:550px}.hero,.placeholder{padding:55px 30px;text-align:center;background:linear-gradient(145deg,#fff,#f8eee4);border:1px solid #eadbcc;border-radius:22px}.badge,.pagehead span{display:inline-block;background:#9b006f;color:#fff;padding:7px 13px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:1.2px}.hero h1,.placeholder h1{font:700 clamp(32px,5vw,54px) Georgia,serif;margin:20px 0 14px}.hero p,.placeholder p{max-width:720px;margin:0 auto;color:#665850;font-size:18px;line-height:1.7}.actions{margin-top:30px}.actions button{border:0;border-radius:999px;padding:14px 24px;background:#8d005f;color:#fff;font-weight:700;cursor:pointer}.note{margin-top:25px;color:#89796e;font-size:14px}.pagehead{text-align:center;margin-bottom:30px}.pagehead h1{font:700 clamp(28px,4vw,44px) Georgia,serif;margin:15px 0 7px}.pagehead p{margin:0;color:#765f53}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.video-card{display:flex;gap:18px;background:#fff;border:1px solid #eadfd4;border-radius:17px;padding:20px;box-shadow:0 6px 18px #4b2c1b0d}.number{font-size:18px;font-weight:800;color:#a00072;min-width:34px}.video-card h2{font:700 20px Georgia,serif;margin:0 0 7px;color:#352721}.video-card p{margin:0 0 16px;color:#89786d;font-size:13px}.card-actions{display:flex;gap:9px;flex-wrap:wrap}.card-actions a{padding:9px 13px;border-radius:9px;border:1px solid #dccfc4;color:#7e005c;text-decoration:none;font-size:13px;font-weight:700}.card-actions a.watch{background:#8d005f;color:#fff;border-color:#8d005f}footer{text-align:center;padding:20px;background:#eee6da;color:#75685f;font-size:13px}footer span{margin:0 8px}@media(max-width:760px){.site{margin:0;min-height:100vh}.brand{font-size:28px}header{padding:24px 20px}nav{padding:0}nav button{flex:1;padding:13px 8px;font-size:14px}main{padding:24px 16px 40px}.grid{grid-template-columns:1fr}.hero,.placeholder{padding:40px 20px}.video-card{padding:17px}.video-card h2{font-size:18px}}
+
+/* Inauguration Stage Styles */
+.inauguration-section {
+  margin-bottom: 40px;
+}
+.stage {
+  position: relative;
+  aspect-ratio: 4/3;
+  background: #fff;
+  overflow: hidden;
+  container-type: inline-size;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+  max-width: 900px;
+  margin: 0 auto;
+}
+.stage-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #1c1c1c;
+  padding-top: 14cqw;
+  opacity: 0;
+  transform: scale(.94);
+  transition: opacity 1.2s ease 1.3s, transform 1.4s ease 1.3s;
+  pointer-events: none;
+  font-family: Calibri, "Segoe UI", Arial, sans-serif;
+}
+.stage.open .stage-text {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.t1 {
+  font-size: 4.2cqw;
+  line-height: 1.25;
+  margin: 0 0 3cqw;
+  margin-bottom: 0 !important;
+}
+.by {
+  font-size: 2.6cqw;
+  margin: 0 0 1cqw;
+}
+.name {
+  font-size: 5.2cqw;
+  margin: 0;
+  font-weight: 700;
+}
+.desig {
+  font-size: 2.6cqw;
+  margin: .4cqw 0 2.4cqw;
+}
+.date {
+  font-size: 2.6cqw;
+  margin: 0;
+}
+.date sup {
+  font-size: .6em;
+}
+.blog {
+  display: inline-block;
+  margin-top: 2.4cqw;
+  font-size: 2.4cqw;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(#e8272d, #b3141b);
+  padding: 1cqw 3cqw;
+  border-radius: 999px;
+  text-decoration: none;
+  box-shadow: 0 .4cqw 1.2cqw rgba(0,0,0,.35);
+  position: relative;
+  z-index: 7;
+}
+.blog:hover {
+  filter: brightness(1.1);
+}
+.blog:focus-visible {
+  outline: 3px solid #1c1c1c;
+  outline-offset: 3px;
+}
+.curtain {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 52%;
+  z-index: 2;
+  background: repeating-linear-gradient(90deg, #a3121a 0, #d81e24 4%, #f03a3f 7%, #d81e24 10%, #a3121a 12%);
+  box-shadow: inset 0 0 6cqw rgba(0,0,0,.35);
+  transition: transform 2.6s cubic-bezier(.65, .05, .25, 1);
+}
+.curtain.left {
+  left: 0;
+  transform-origin: left;
+  border-radius: 0 0 40% 0/0 0 12% 0;
+}
+.curtain.right {
+  right: 0;
+  transform-origin: right;
+  border-radius: 0 0 0 40%/0 0 0 12%;
+}
+.stage.open .curtain.left {
+  transform: translateX(-100%) scaleX(.5);
+}
+.stage.open .curtain.right {
+  transform: translateX(100%) scaleX(.5);
+}
+.valance {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 11%;
+  z-index: 3;
+  background: repeating-linear-gradient(90deg, #a3121a 0, #d81e24 1.6%, #f24a4f 2.4%, #d81e24 3.2%, #a3121a 4%);
+  box-shadow: 0 .8cqw 1.6cqw rgba(0,0,0,.4);
+  border-radius: 0 0 .8cqw .8cqw;
+}
+.tie {
+  position: absolute;
+  top: 44%;
+  width: 4.5%;
+  height: 7%;
+  background: linear-gradient(90deg, #8d0d14, #ea2a30, #8d0d14);
+  border-radius: 1cqw;
+  z-index: 4;
+  transition: opacity 1s;
+}
+.tie.tl { left: 0; }
+.tie.tr { right: 0; }
+.stage.open .tie { opacity: 0; }
+.curtain-btn {
+  font: 600 18px/1 Calibri, "Segoe UI", Arial, sans-serif;
+  color: #fff;
+  background: linear-gradient(#e8272d, #b3141b);
+  border: 0;
+  border-radius: 999px;
+  padding: 14px 34px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,.5);
+  transition: transform .15s;
+}
+.curtain-btn:hover {
+  transform: translateY(-1px);
+}
+.curtain-btn:active {
+  transform: translateY(1px);
+}
+.curtain-btn:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .curtain, .stage-text, .tie {
+    transition-duration: .01s;
+    transition-delay: 0s;
+  }
+}
+
+/* Mathematics Post Detail Page Styles */
+.post-detail {
+  max-width: 960px;
+  margin: 0 auto;
+}
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #f1e7d8;
+  color: #7e005c;
+  border: 1px solid #dccfc4;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 24px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+.back-btn:hover {
+  background: #8d005f;
+  color: #fff;
+  border-color: #8d005f;
+}
+.post-header {
+  margin-bottom: 24px;
+}
+.post-header .badge {
+  margin-bottom: 12px;
+}
+.post-header h1 {
+  font: 700 clamp(24px, 3.5vw, 38px) Georgia, serif;
+  color: #241b16;
+  margin: 8px 0;
+  line-height: 1.3;
+}
+.post-header p {
+  color: #765f53;
+  margin: 0;
+  font-size: 15px;
+}
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.25);
+  margin-bottom: 24px;
+  border: 1px solid #eadfd4;
+}
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.post-footer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e6dacb;
+}
+.nav-buttons {
+  display: flex;
+  gap: 12px;
+}
+.nav-buttons button {
+  background: #fffaf1;
+  color: #5c4a3e;
+  border: 1px solid #dccfc4;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.nav-buttons button:hover:not(:disabled) {
+  background: #8d005f;
+  color: #fff;
+  border-color: #8d005f;
+}
+.nav-buttons button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+
