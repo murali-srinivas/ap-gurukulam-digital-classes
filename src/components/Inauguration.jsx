@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 
 export default function Inauguration() {
   const [searchParams] = useSearchParams();
-  const showCurtain = searchParams.has('showCurtain');
+  const showCurtain = searchParams.has('showcurtain');
 
   if (!showCurtain) return null;
 
