@@ -376,10 +376,10 @@ function GurukulamMagazine() {
           download="Gurukulam-Magazine.pdf"
           style={{
             padding: '10px 22px', borderRadius: '999px',
-            background: 'rgba(255,255,255,0.1)', color: '#fff',
+            background: '#ffffff', color: '#1a1a2e',
             textDecoration: 'none', fontWeight: '700', fontSize: '14px',
             display: 'inline-flex', alignItems: 'center', gap: '8px',
-            border: '1px solid rgba(255,255,255,0.25)',
+            border: '2px solid #8d005f',
             boxShadow: '0 4px 14px rgba(0,0,0,0.15)'
           }}
         >
