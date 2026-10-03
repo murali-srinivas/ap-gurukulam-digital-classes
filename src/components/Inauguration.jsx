@@ -4,7 +4,7 @@ export default function Inauguration() {
   const [isOpen, setIsOpen] = useState(false);
   const stageRef = useRef(null);
   const canvasRef = useRef(null);
-  
+
   // Audio state
   const ctxRef = useRef(null);
   const crowdBufRef = useRef(null);
@@ -293,7 +293,7 @@ export default function Inauguration() {
     window.addEventListener('resize', handleResize);
     try {
       setTimeout(buildCrowd, 100);
-    } catch (e) {}
+    } catch (e) { }
 
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -309,7 +309,7 @@ export default function Inauguration() {
       startFlowers();
       try {
         playApplause();
-      } catch (e) {}
+      } catch (e) { }
     } else {
       stopFlowers();
       stopApplause();
@@ -361,7 +361,7 @@ export default function Inauguration() {
           </p>
           <a
             className="blog"
-            href="https://apgurukulamdigitalclasses.blogspot.com/p/phy-science.html"
+            href="https://apgurukulamdigitalclasses.vercel.app/physics"
             rel="noopener noreferrer"
             target="_blank"
           >
