@@ -63,8 +63,13 @@ function Layout({children}){
   return (
     <div className="site">
       <header>
-        <button className="brand" onClick={()=>navg('/')}>AP-GURUKULAM-DIGITAL CLASSES</button>
+        <div className="header-content">
+          <img src="/ap-emblem.png" alt="AP Emblem" className="header-logo logo-left" onClick={()=>navg('/')} style={{ cursor: 'pointer' }} />
+          <button className="brand" onClick={()=>navg('/')}>AP-GURUKULAM-DIGITAL CLASSES</button>
+          <img src="/aptwreis-logo.png" alt="APTWREIS Logo" className="header-logo logo-right" onClick={()=>navg('/')} style={{ cursor: 'pointer' }} />
+        </div>
       </header>
+
       <nav>
         {nav.map(([n,p])=>(
           <button 
@@ -485,6 +490,7 @@ function App(){
 }
 
 createRoot(document.getElementById('root')).render(<BrowserRouter><App/></BrowserRouter>);
+
 
 
 
