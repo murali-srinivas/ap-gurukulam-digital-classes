@@ -12,12 +12,12 @@ const getChapters = (videos) => ['All', ...Array.from(new Set(videos.map(v => v.
 
 /* ── Dropdown Nav config ── */
 const navConfig = [
-  { label: 'Home',               path: '/',            chapters: [] },
-  { label: 'Mathematics',        path: '/mathematics', chapters: getChapters(mathVideos) },
-  { label: 'Phy Science',        path: '/physics',     chapters: getChapters(physicsVideos) },
-  { label: 'Bio Science',        path: '/biology',     chapters: [] },
-  { label: 'Social',             path: '/social',      chapters: getChapters(socialVideos) },
-  { label: 'Gurukulam Magazine', path: '/magazine',    chapters: [] },
+  { label: 'Home', path: '/', chapters: [] },
+  { label: 'Mathematics', path: '/mathematics', chapters: getChapters(mathVideos) },
+  { label: 'Phy Science', path: '/physics', chapters: getChapters(physicsVideos) },
+  { label: 'Bio Science', path: '/biology', chapters: [] },
+  { label: 'Social', path: '/social', chapters: getChapters(socialVideos) },
+  { label: 'Gurukulam Magazine', path: '/magazine', chapters: [] },
 ];
 
 /* ── Nav with dropdowns ── */
@@ -104,8 +104,8 @@ function Layout({ children }) {
   const navg = useNavigate();
 
   useEffect(() => {
-    const mathPostMatch  = loc.pathname.match(/^\/mathematics\/(\d+)$/);
-    const phyPostMatch   = loc.pathname.match(/^\/physics\/(\d+)$/);
+    const mathPostMatch = loc.pathname.match(/^\/mathematics\/(\d+)$/);
+    const phyPostMatch = loc.pathname.match(/^\/physics\/(\d+)$/);
     const socialPostMatch = loc.pathname.match(/^\/social\/(\d+)$/);
 
     if (mathPostMatch) {
@@ -351,7 +351,7 @@ function GurukulamMagazine() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 16px', minHeight: '80vh' }}>
       <section className="pagehead" style={{ marginBottom: '24px', width: '100%', maxWidth: '960px' }}>
-        <span>APTWEI SOCIETY</span>
+        <span>APTWREI SOCIETY</span>
         <h1>📰 GURUKULAM MAGAZINE</h1>
         <p>Monthly publication featuring student achievements, academic articles &amp; school events</p>
       </section>
@@ -409,8 +409,8 @@ function App() {
   const loc = useLocation();
   const p = loc.pathname;
 
-  const mathPostMatch   = p.match(/^\/mathematics\/(\d+)$/);
-  const phyPostMatch    = p.match(/^\/physics\/(\d+)$/);
+  const mathPostMatch = p.match(/^\/mathematics\/(\d+)$/);
+  const phyPostMatch = p.match(/^\/physics\/(\d+)$/);
   const socialPostMatch = p.match(/^\/social\/(\d+)$/);
 
   let content;
