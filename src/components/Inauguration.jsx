@@ -1,1618 +1,386 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { createRoot } from 'react-dom/client';
-import {
-  BrowserRouter,
-  useLocation,
-  useNavigate
-} from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
-import './styles.css';
+export default function Inauguration() {
+  const [searchParams] = useSearchParams();
+  const showCurtain = searchParams.has('showcurtain');
 
-import { mathVideos } from './data/mathematics';
-import { physicsVideos } from './data/physics';
-import { socialVideos } from './data/social';
+  if (!showCurtain) return null;
 
-import Inauguration from './components/Inauguration';
+  const [isOpen, setIsOpen] = useState(false);
+  const stageRef = useRef(null);
+  const canvasRef = useRef(null);
 
+  // Audio state
+  const ctxRef = useRef(null);
+  const crowdBufRef = useRef(null);
+  const irBufRef = useRef(null);
+  const masterGainRef = useRef(null);
+  const DUR = 4.8;
 
-/* =========================================================
-   CHAPTER HELPER
-========================================================= */
+  // Flower animation refs
+  const flRef = useRef([]);
+  const rafRef = useRef(0);
+  const spawnUntilRef = useRef(0);
+  const lastRef = useRef(0);
+  const timerRef = useRef(null);
 
-const getChapters = (videos) => [
-  'All',
-  ...Array.from(new Set(videos.map(v => v.chapter)))
-];
+  const COLS = ['#ff4d79', '#ffb300', '#ff7043', '#ffffff', '#ff80ab', '#ffd54f', '#e53935'];
 
+  // --- Web Audio Synthesized Applause ---
+  const buildCrowd = () => {
+    if (!ctxRef.current) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        ctxRef.current = new AudioContextClass();
+      }
+    }
+    const ctx = ctxRef.current;
+    if (!ctx || crowdBufRef.current) return;
 
-/* =========================================================
-   NAVIGATION CONFIGURATION
-========================================================= */
+    const sr = ctx.sampleRate;
+    const R = Math.random;
+    const N = Math.floor(sr * DUR);
+    const bank = [];
 
-const navConfig = [
-  {
-    label: 'Home',
-    path: '/',
-    chapters: []
-  },
-  {
-    label: 'Mathematics',
-    path: '/mathematics',
-    chapters: getChapters(mathVideos)
-  },
-  {
-    label: 'Phy Science',
-    path: '/physics',
-    chapters: getChapters(physicsVideos)
-  },
-  {
-    label: 'Bio Science',
-    path: '/biology',
-    chapters: []
-  },
-  {
-    label: 'Social',
-    path: '/social',
-    chapters: getChapters(socialVideos)
-  },
-  {
-    label: 'Gurukulam Magazine',
-    path: '/magazine',
-    chapters: []
-  }
-];
+    for (let v = 0; v < 48; v++) {
+      const L = Math.floor(sr * 0.1);
+      const x = new Float32Array(L);
+      const f = 900 + R() * 2800;
+      const r = 0.88 + R() * 0.07;
+      const a1 = 2 * r * Math.cos(2 * Math.PI * f / sr);
+      const a2 = -r * r;
+      const hits = [0, (0.003 + R() * 0.005) * sr | 0];
+      if (R() < 0.5) hits.push((0.009 + R() * 0.006) * sr | 0);
 
+      hits.forEach((h, k) => {
+        for (let i = h; i < L; i++) {
+          const t = (i - h) / sr;
+          x[i] += (R() * 2 - 1) * (k ? 0.6 : 1) * Math.exp(-t / 0.008);
+        }
+      });
 
-/* =========================================================
-   NAVIGATION BAR
-========================================================= */
+      const y = new Float32Array(L);
+      let y1 = 0, y2 = 0, pk = 0;
+      for (let i = 0; i < L; i++) {
+        const t = i / sr;
+        const o = x[i] * 0.35 + a1 * y1 + a2 * y2 + 0.25 * Math.sin(2 * Math.PI * (300 + R() * 200) * t) * Math.exp(-t / 0.007) * (i < sr * 0.03 ? 1 : 0);
+        y[i] = o;
+        y2 = y1;
+        y1 = o;
+        pk = Math.max(pk, Math.abs(o));
+      }
+      for (let i = 0; i < L; i++) y[i] /= (pk || 1);
+      bank.push(y);
+    }
 
-function NavBar() {
-  const loc = useLocation();
-  const navg = useNavigate();
+    const Lc = new Float32Array(N);
+    const Rc = new Float32Array(N);
+    const people = 260;
 
-  const [openMenu, setOpenMenu] = useState(null);
+    for (let p = 0; p < people; p++) {
+      const pan = R() * 2 - 1;
+      const gl = Math.cos((pan + 1) * Math.PI / 4);
+      const gr = Math.sin((pan + 1) * Math.PI / 4);
+      const vol = 0.25 + R() * 0.75;
+      const period = 0.24 + R() * 0.2;
+      let t = R() * 1.3;
+      const end = DUR - 0.2 - R() * 1.6;
 
-  const navRef = useRef(null);
+      while (t < end) {
+        const c = bank[(R() * 48) | 0];
+        const g = vol * (0.6 + R() * 0.4);
+        const st = (t * sr) | 0;
+        for (let i = 0; i < c.length && st + i < N; i++) {
+          const v = c[i] * g;
+          Lc[st + i] += v * gl;
+          Rc[st + i] += v * gr;
+        }
+        t += period * (0.85 + R() * 0.3);
+      }
+    }
+
+    let pk = 0;
+    for (let i = 0; i < N; i++) pk = Math.max(pk, Math.abs(Lc[i]), Math.abs(Rc[i]));
+    const k = 0.9 / (pk || 1);
+    for (let i = 0; i < N; i++) {
+      Lc[i] *= k;
+      Rc[i] *= k;
+    }
+
+    crowdBufRef.current = ctx.createBuffer(2, N, sr);
+    crowdBufRef.current.copyToChannel(Lc, 0);
+    crowdBufRef.current.copyToChannel(Rc, 1);
+
+    const irLen = Math.floor(sr * 1.8);
+    irBufRef.current = ctx.createBuffer(2, irLen, sr);
+    for (let c = 0; c < 2; c++) {
+      const d = irBufRef.current.getChannelData(c);
+      for (let i = 0; i < irLen; i++) d[i] = (R() * 2 - 1) * Math.pow(1 - i / irLen, 2.8);
+    }
+  };
+
+  const playApplause = () => {
+    buildCrowd();
+    const ctx = ctxRef.current;
+    if (!ctx || !crowdBufRef.current || !irBufRef.current) return;
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+    }
+
+    const t0 = ctx.currentTime + 0.03;
+    const master = ctx.createGain();
+    masterGainRef.current = master;
+    master.gain.setValueAtTime(0.0001, t0);
+    master.gain.exponentialRampToValueAtTime(1, t0 + 0.5);
+    master.gain.setValueAtTime(1, t0 + DUR - 1.2);
+    master.gain.exponentialRampToValueAtTime(0.0001, t0 + DUR);
+
+    const src = ctx.createBufferSource();
+    src.buffer = crowdBufRef.current;
+
+    const rev = ctx.createConvolver();
+    rev.buffer = irBufRef.current;
+
+    const wet = ctx.createGain();
+    wet.gain.value = 0.3;
+
+    src.connect(master);
+    master.connect(ctx.destination);
+    master.connect(rev);
+    rev.connect(wet);
+    wet.connect(ctx.destination);
+
+    src.start(t0);
+  };
+
+  const stopApplause = () => {
+    const ctx = ctxRef.current;
+    const master = masterGainRef.current;
+    if (master && ctx) {
+      try {
+        master.gain.cancelScheduledValues(ctx.currentTime);
+        master.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.1);
+      } catch (e) {
+        // ignore audio cancellation edge cases
+      }
+    }
+  };
+
+  // --- Falling Flowers Animation ---
+  const fit = () => {
+    const cv = canvasRef.current;
+    const stage = stageRef.current;
+    if (!cv || !stage) return;
+    const cx = cv.getContext('2d');
+    const d = window.devicePixelRatio || 1;
+    cv.width = stage.clientWidth * d;
+    cv.height = stage.clientHeight * d;
+    cx.setTransform(d, 0, 0, d, 0, 0);
+  };
+
+  const spawn = () => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const W = stage.clientWidth;
+    const k = W / 1000;
+    const f = {
+      x: Math.random() * W,
+      y: -30 * k,
+      vy: (70 + Math.random() * 90) * k,
+      amp: (20 + Math.random() * 40) * k,
+      ph: Math.random() * 6.28,
+      sw: 1 + Math.random() * 1.5,
+      rot: Math.random() * 6.28,
+      vr: (Math.random() - 0.5) * 3,
+      fp: Math.random() * 6.28,
+      fs: 2 + Math.random() * 3,
+      s: (14 + Math.random() * 18) * k,
+      c: COLS[(Math.random() * COLS.length) | 0],
+      petal: Math.random() < 0.35,
+      bx: 0
+    };
+    f.bx = f.x;
+    flRef.current.push(f);
+  };
+
+  const draw = (cx, f) => {
+    cx.save();
+    cx.translate(f.x, f.y);
+    cx.rotate(f.rot);
+    cx.scale(1, 0.45 + 0.55 * Math.abs(Math.cos(f.fp)));
+    cx.fillStyle = f.c;
+    cx.strokeStyle = 'rgba(0,0,0,.18)';
+    cx.lineWidth = 1;
+    if (f.petal) {
+      cx.beginPath();
+      cx.ellipse(0, 0, f.s * 0.3, f.s * 0.55, 0, 0, 6.283);
+      cx.fill();
+      cx.stroke();
+    } else {
+      for (let i = 0; i < 5; i++) {
+        cx.rotate(1.2566);
+        cx.beginPath();
+        cx.ellipse(0, -f.s * 0.5, f.s * 0.3, f.s * 0.5, 0, 0, 6.283);
+        cx.fill();
+        cx.stroke();
+      }
+      cx.fillStyle = f.c === '#ffb300' || f.c === '#ffd54f' ? '#e65100' : '#ffc107';
+      cx.beginPath();
+      cx.arc(0, 0, f.s * 0.2, 0, 6.283);
+      cx.fill();
+    }
+    cx.restore();
+  };
+
+  const loop = (t) => {
+    const cv = canvasRef.current;
+    const stage = stageRef.current;
+    if (!cv || !stage) return;
+    const cx = cv.getContext('2d');
+    const dt = Math.min(0.05, (t - lastRef.current) / 1000 || 0.016);
+    lastRef.current = t;
+    const W = stage.clientWidth;
+    const H = stage.clientHeight;
+    cx.clearRect(0, 0, W, H);
+
+    if (t < spawnUntilRef.current) {
+      const n = Math.round(30 * dt + Math.random());
+      for (let i = 0; i < n; i++) spawn();
+    }
+
+    flRef.current = flRef.current.filter((f) => f.y < H + 40);
+    flRef.current.forEach((f) => {
+      f.y += f.vy * dt;
+      f.ph += f.sw * dt;
+      f.x = f.bx + Math.sin(f.ph) * f.amp;
+      f.rot += f.vr * dt;
+      f.fp += f.fs * dt;
+      draw(cx, f);
+    });
+
+    if (flRef.current.length || t < spawnUntilRef.current) {
+      rafRef.current = requestAnimationFrame(loop);
+    } else {
+      rafRef.current = 0;
+    }
+  };
+
+  const startFlowers = () => {
+    fit();
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      lastRef.current = performance.now();
+      spawnUntilRef.current = lastRef.current + 6500;
+      if (!rafRef.current) {
+        rafRef.current = requestAnimationFrame(loop);
+      }
+    }, 400);
+  };
+
+  const stopFlowers = () => {
+    clearTimeout(timerRef.current);
+    spawnUntilRef.current = 0;
+    flRef.current = [];
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
+    }
+    const cv = canvasRef.current;
+    const stage = stageRef.current;
+    if (cv && stage) {
+      const cx = cv.getContext('2d');
+      cx.clearRect(0, 0, stage.clientWidth, stage.clientHeight);
+    }
+  };
 
   useEffect(() => {
-    const handler = (e) => {
-      if (
-        navRef.current &&
-        !navRef.current.contains(e.target)
-      ) {
-        setOpenMenu(null);
-      }
-    };
-
-    document.addEventListener('mousedown', handler);
+    const handleResize = () => fit();
+    window.addEventListener('resize', handleResize);
+    try {
+      setTimeout(buildCrowd, 100);
+    } catch (e) { }
 
     return () => {
-      document.removeEventListener('mousedown', handler);
+      window.removeEventListener('resize', handleResize);
+      stopFlowers();
     };
   }, []);
 
-  const isActive = (path) =>
-    loc.pathname === path ||
-    (path !== '/' &&
-      loc.pathname.startsWith(path + '/'));
+  const toggleCurtain = () => {
+    const nextState = !isOpen;
+    setIsOpen(nextState);
 
-  return (
-    <nav ref={navRef}>
-
-      {navConfig.map(
-        ({ label, path, chapters }) => {
-
-          const hasDropdown =
-            chapters.length > 1;
-
-          return (
-            <div
-              key={path}
-              className="nav-item"
-              onMouseEnter={() =>
-                hasDropdown &&
-                setOpenMenu(path)
-              }
-              onMouseLeave={() =>
-                setOpenMenu(null)
-              }
-            >
-
-              <button
-                className={
-                  isActive(path)
-                    ? 'active'
-                    : ''
-                }
-                onClick={() => {
-                  navg(path);
-                  setOpenMenu(null);
-                }}
-              >
-
-                {label}
-
-                {hasDropdown && (
-                  <span className="nav-arrow">
-                    {openMenu === path
-                      ? '▲'
-                      : '▼'}
-                  </span>
-                )}
-
-              </button>
-
-
-              {hasDropdown &&
-                openMenu === path && (
-
-                  <div className="nav-dropdown">
-
-                    {chapters.map(ch => (
-
-                      <button
-                        key={ch}
-                        className="nav-dropdown-item"
-                        onClick={() => {
-
-                          navg(
-                            ch === 'All'
-                              ? path
-                              : `${path}?chapter=${encodeURIComponent(ch)}`
-                          );
-
-                          setOpenMenu(null);
-                        }}
-                      >
-
-                        {ch === 'All'
-                          ? '📚 All Chapters'
-                          : `📖 ${ch}`}
-
-                      </button>
-
-                    ))}
-
-                  </div>
-
-                )}
-
-            </div>
-          );
-        }
-      )}
-
-    </nav>
-  );
-}
-
-
-/* =========================================================
-   CHAPTER FILTER
-========================================================= */
-
-function ChapterFilter({
-  chapters,
-  active,
-  onChange
-}) {
-  return (
-    <div className="chapter-filter">
-
-      {chapters.map(ch => (
-
-        <button
-          key={ch}
-          className={`chapter-pill${active === ch
-            ? ' active'
-            : ''
-            }`}
-          onClick={() =>
-            onChange(ch)
-          }
-        >
-          {ch}
-        </button>
-
-      ))}
-
-    </div>
-  );
-}
-
-
-/* =========================================================
-   MAIN LAYOUT
-========================================================= */
-
-function Layout({ children }) {
-
-  const loc = useLocation();
-  const navg = useNavigate();
-
-  useEffect(() => {
-
-    const mathPostMatch =
-      loc.pathname.match(
-        /^\/mathematics\/(\d+)$/
-      );
-
-    const phyPostMatch =
-      loc.pathname.match(
-        /^\/physics\/(\d+)$/
-      );
-
-    const socialPostMatch =
-      loc.pathname.match(
-        /^\/social\/(\d+)$/
-      );
-
-
-    if (mathPostMatch) {
-
-      const v = mathVideos.find(
-        v =>
-          v.id ===
-          parseInt(
-            mathPostMatch[1],
-            10
-          )
-      );
-
-      document.title = v
-        ? `AP-GURUKULAM: ${v.title}`
-        : 'AP-GURUKULAM-DIGITAL CLASSES: Mathematics';
-
+    if (nextState) {
+      startFlowers();
+      try {
+        playApplause();
+      } catch (e) { }
+    } else {
+      stopFlowers();
+      stopApplause();
     }
-
-    else if (phyPostMatch) {
-
-      const v = physicsVideos.find(
-        v =>
-          v.id ===
-          parseInt(
-            phyPostMatch[1],
-            10
-          )
-      );
-
-      document.title = v
-        ? `AP-GURUKULAM: ${v.title}`
-        : 'AP-GURUKULAM-DIGITAL CLASSES: Physical Science';
-
-    }
-
-    else if (socialPostMatch) {
-
-      const v = socialVideos.find(
-        v =>
-          v.id ===
-          parseInt(
-            socialPostMatch[1],
-            10
-          )
-      );
-
-      document.title = v
-        ? `AP-GURUKULAM: ${v.title}`
-        : 'AP-GURUKULAM-DIGITAL CLASSES: Social Studies';
-
-    }
-
-    else if (
-      loc.pathname ===
-      '/mathematics'
-    ) {
-
-      document.title =
-        'AP-GURUKULAM-DIGITAL CLASSES: Mathematics';
-
-    }
-
-    else if (
-      loc.pathname === '/physics' ||
-      loc.pathname ===
-      '/p/phy-science.html'
-    ) {
-
-      document.title =
-        'AP-GURUKULAM-DIGITAL CLASSES: Physical Science';
-
-    }
-
-    else if (
-      loc.pathname === '/biology' ||
-      loc.pathname ===
-      '/biological-science'
-    ) {
-
-      document.title =
-        'AP-GURUKULAM-DIGITAL CLASSES: Biological Science';
-
-    }
-
-    else if (
-      loc.pathname === '/social' ||
-      loc.pathname ===
-      '/p/social.html'
-    ) {
-
-      document.title =
-        'AP-GURUKULAM-DIGITAL CLASSES: Social Studies';
-
-    }
-
-    else {
-
-      document.title =
-        'AP-GURUKULAM-DIGITAL CLASSES';
-
-    }
-
-  }, [loc.pathname]);
-
+  };
 
   return (
-
-    <div className="site">
-
-      {/* HEADER */}
-
-      <header>
-
-        <div className="header-content">
-
-          <img
-            src="/ap-emblem.png"
-            alt="AP Emblem"
-            className="header-logo logo-left"
-            onClick={() =>
-              navg('/')
-            }
-            style={{
-              cursor: 'pointer'
-            }}
-          />
-
-
-          <button
-            className="brand"
-            onClick={() =>
-              navg('/')
-            }
-          >
-            AP-GURUKULAM-DIGITAL CLASSES
-          </button>
-
-
-          <img
-            src="/aptwreis-logo.png"
-            alt="APTWREIS Logo"
-            className="header-logo logo-right"
-            onClick={() =>
-              navg('/')
-            }
-            style={{
-              cursor: 'pointer'
-            }}
-          />
-
-        </div>
-
-      </header>
-
-
-      <NavBar />
-
-
-      <main>
-        {children}
-      </main>
-
-
-      <footer>
-
-        APTWREI Society
-        (Gurukulam), Amaravati
-
-        <span>•</span>
-
-        Empowering Students
-        Through Digital Learning
-
-      </footer>
-
-    </div>
-
-  );
-}
-
-
-/* =========================================================
-   VIDEO GRID
-========================================================= */
-
-function VideoGrid({
-  videos,
-  basePath,
-  subject
-}) {
-
-  const loc = useLocation();
-  const navg = useNavigate();
-
-  const searchParams =
-    new URLSearchParams(
-      loc.search
-    );
-
-  const chapterParam =
-    searchParams.get('chapter') ||
-    'All';
-
-  const chapters =
-    getChapters(videos);
-
-  const [
-    activeChapter,
-    setActiveChapter
-  ] = useState(
-    chapters.includes(
-      chapterParam
-    )
-      ? chapterParam
-      : 'All'
-  );
-
-
-  useEffect(() => {
-
-    const ch =
-      new URLSearchParams(
-        loc.search
-      ).get('chapter') ||
-      'All';
-
-    setActiveChapter(
-      chapters.includes(ch)
-        ? ch
-        : 'All'
-    );
-
-  }, [loc.search]);
-
-
-  const handleChapterChange =
-    (ch) => {
-
-      setActiveChapter(ch);
-
-      navg(
-        ch === 'All'
-          ? basePath
-          : `${basePath}?chapter=${encodeURIComponent(ch)}`
-      );
-
-    };
-
-
-  const filtered =
-    activeChapter === 'All'
-      ? videos
-      : videos.filter(
-        v =>
-          v.chapter ===
-          activeChapter
-      );
-
-
-  const grouped =
-    filtered.reduce(
-      (acc, v) => {
-
-        (
-          acc[v.chapter] =
-          acc[v.chapter] || []
-        ).push(v);
-
-        return acc;
-
-      },
-      {}
-    );
-
-
-  return (
-    <>
-
-      <ChapterFilter
-        chapters={chapters}
-        active={activeChapter}
-        onChange={
-          handleChapterChange
-        }
-      />
-
-
-      {Object.entries(grouped).map(
-        ([chapter, vids]) => (
-
-          <div
-            key={chapter}
-            className="chapter-group"
-          >
-
-            <div className="chapter-heading">
-
-              <span className="chapter-icon">
-                📖
-              </span>
-
-              <h2>
-                {chapter}
-              </h2>
-
-              <span className="chapter-count">
-                {vids.length} video
-                {vids.length !== 1
-                  ? 's'
-                  : ''}
-              </span>
-
-            </div>
-
-
-            <div className="grid">
-
-              {vids.map(v => {
-
-                const globalIndex =
-                  videos.findIndex(
-                    x =>
-                      x.id ===
-                      v.id
-                  );
-
-
-                return (
-
-                  <article
-                    className="video-card"
-                    key={v.id}
-                  >
-
-                    <div className="number">
-                      {String(
-                        globalIndex + 1
-                      ).padStart(
-                        2,
-                        '0'
-                      )}
-                    </div>
-
-
-                    <div>
-
-                      <h2
-                        style={{
-                          cursor:
-                            'pointer'
-                        }}
-                        onClick={() =>
-                          navg(
-                            `${basePath}/${v.id}`
-                          )
-                        }
-                      >
-                        {v.title}
-                      </h2>
-
-
-                      <p>
-                        10th Class •{' '}
-                        {subject}
-                      </p>
-
-
-                      <div className="card-actions">
-
-                        <button
-                          className="watch"
-                          onClick={() =>
-                            navg(
-                              `${basePath}/${v.id}`
-                            )
-                          }
-                        >
-                          ▶ Watch Video
-                        </button>
-
-
-                        <a
-                          href={v.drive}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          ↗ Open Drive
-                        </a>
-
-                      </div>
-
-                    </div>
-
-                  </article>
-
-                );
-
-              })}
-
-            </div>
-
-          </div>
-
-        )
-      )}
-
-    </>
-  );
-}
-
-
-/* =========================================================
-   HOME PAGE
-========================================================= */
-
-function Home() {
-
-  const navg = useNavigate();
-
-  return (
-
-    <>
-
-      <Inauguration />
-
-
-      {/* =================================================
-          WELCOME BOX
-      ================================================= */}
-
-      <section
-        className="hero"
-        style={{
-          position: 'relative',
-          overflow: 'hidden'
-        }}
-      >
-
-
-        {/* ===============================================
-            TOP LEFT IMAGE
-        =============================================== */}
-
-        <img
-          src="/gurukulam-small.png"
-          alt="Gurukulam"
-          style={{
-            position: 'absolute',
-            top: '15px',
-            left: '15px',
-            width: '55px',
-            height: '55px',
-            objectFit: 'contain',
-            borderRadius: '8px',
-            zIndex: 2
-          }}
-        />
-
-
-        {/* ===============================================
-            TOP RIGHT IMAGE - ORIGINAL
-        =============================================== */}
-
-        <img
-          src="/gurukulam-right.png"
-          alt="Gurukulam"
-          style={{
-            position: 'absolute',
-            top: '15px',
-            right: '15px',
-            width: '55px',
-            height: '55px',
-            objectFit: 'contain',
-            borderRadius: '8px',
-            zIndex: 2
-          }}
-        />
-
-
-        {/* ===============================================
-            NEW IMAGE
-            TOP RIGHT, IMMEDIATELY LEFT OF THE
-            PREVIOUS RIGHT-SIDE IMAGE
-        =============================================== */}
-
-        <img
-          src="/secy.png"
-          alt="Gurukulam"
-          style={{
-            position: 'absolute',
-            top: '15px',
-
-            /* 55px image width
-               + 10px gap
-               + 15px right margin
-               = 80px */
-
-            right: '80px',
-
-            width: '55px',
-            height: '55px',
-
-            objectFit: 'contain',
-
-            borderRadius: '8px',
-
-            zIndex: 2
-          }}
-        />
-
-
-        {/* ===============================================
-            HERO CONTENT
-        =============================================== */}
-
-        <div className="badge">
-          DIGITAL LEARNING PLATFORM
-        </div>
-
-
-        <h1>
-          Welcome to Gurukulam Digital Classes
-        </h1>
-
-
-        <p>
-          Digital learning resources for 10th Class
-          students in Mathematics, Physical Science,
-          Biological Science and Social Studies.
-        </p>
-
-
-        <div
-          className="actions"
-          style={{
-            display: 'flex',
-            gap: '12px',
-            flexWrap: 'wrap',
-            justifyContent: 'center'
-          }}
-        >
-
-          <button
-            onClick={() =>
-              navg('/mathematics')
-            }
-          >
-            Explore Mathematics →
-          </button>
-
-
-          <button
-            onClick={() =>
-              navg('/physics')
-            }
-            style={{
-              background: '#9f7f27'
-            }}
-          >
-            Explore Physical Science →
-          </button>
-
-
-          <button
-            onClick={() =>
-              navg('/social')
-            }
-            style={{
-              background: '#007f9f'
-            }}
-          >
-            Explore Social Studies →
-          </button>
-
-        </div>
-
-
-        <div className="note">
-          Biology page will be added when its
-          Blogger content is migrated.
-        </div>
-
-      </section>
-
-    </>
-
-  );
-}
-
-
-/* =========================================================
-   MATHEMATICS PAGE
-========================================================= */
-
-function Mathematics() {
-
-  return (
-
-    <>
-
-      <section className="pagehead">
-
-        <span>
-          CLASS 10
-        </span>
-
-        <h1>
-          MATHEMATICS VIDEOS
-        </h1>
-
-        <p>
-          Learn • Understand • Excel
-        </p>
-
-      </section>
-
-
-      <VideoGrid
-        videos={mathVideos}
-        basePath="/mathematics"
-        subject="Mathematics"
-      />
-
-    </>
-
-  );
-}
-
-
-/* =========================================================
-   PHYSICAL SCIENCE PAGE
-========================================================= */
-
-function PhysicalScience() {
-
-  return (
-
-    <>
-
-      <section className="pagehead">
-
-        <span>
-          CLASS 10
-        </span>
-
-        <h1>
-          PHYSICAL SCIENCE VIDEOS
-        </h1>
-
-        <p>
-          Explore • Experiment • Excel
-        </p>
-
-      </section>
-
-
-      <VideoGrid
-        videos={physicsVideos}
-        basePath="/physics"
-        subject="Physical Science"
-      />
-
-    </>
-
-  );
-}
-
-
-/* =========================================================
-   SOCIAL STUDIES PAGE
-========================================================= */
-
-function SocialStudies() {
-
-  return (
-
-    <>
-
-      <section className="pagehead">
-
-        <span>
-          CLASS 10
-        </span>
-
-        <h1>
-          SOCIAL STUDIES VIDEOS
-        </h1>
-
-        <p>
-          Explore • Discover • Transform
-        </p>
-
-      </section>
-
-
-      <VideoGrid
-        videos={socialVideos}
-        basePath="/social"
-        subject="Social Studies"
-      />
-
-    </>
-
-  );
-}
-
-
-/* =========================================================
-   VIDEO POST DETAIL
-========================================================= */
-
-function PostDetail({
-  videos,
-  basePath,
-  subject,
-  badgeLabel
-}) {
-
-  const navg = useNavigate();
-  const loc = useLocation();
-
-  const match =
-    loc.pathname.match(
-      /\/(\d+)$/
-    );
-
-  const id =
-    match
-      ? parseInt(
-        match[1],
-        10
-      )
-      : null;
-
-  const videoIndex =
-    videos.findIndex(
-      v => v.id === id
-    );
-
-  const video =
-    videos[videoIndex];
-
-
-  if (!video) {
-
-    return (
-
-      <section className="placeholder">
-
-        <h1>
-          Video Not Found
-        </h1>
-
-        <p>
-          The requested video lesson
-          could not be found.
-        </p>
-
-        <button
-          className="back-btn"
-          onClick={() =>
-            navg(basePath)
-          }
-        >
-          ← Back to List
-        </button>
-
-      </section>
-
-    );
-  }
-
-
-  const embedUrl =
-    video.drive
-      ? video.drive.replace(
-        /\/view(\?.*)?$/,
-        '/preview'
-      )
-      : '';
-
-
-  const prevVideo =
-    videoIndex > 0
-      ? videos[
-      videoIndex - 1
-      ]
-      : null;
-
-
-  const nextVideo =
-    videoIndex <
-      videos.length - 1
-      ? videos[
-      videoIndex + 1
-      ]
-      : null;
-
-
-  return (
-
-    <div className="post-detail">
-
-      <button
-        className="back-btn"
-        onClick={() =>
-          navg(basePath)
-        }
-      >
-        ← Back to {subject} Videos
-      </button>
-
-
-      <div className="post-header">
-
-        <span className="badge">
-          {badgeLabel}
-        </span>
-
-
-        <div className="chapter-tag">
-          📖 {video.chapter}
-        </div>
-
-
-        <h1>
-          {video.title}
-        </h1>
-
-
-        <p>
-          Lesson{' '}
-          {String(
-            video.id
-          ).padStart(
-            2,
-            '0'
-          )}
-          {' '}of{' '}
-          {videos.length}
-          {' '}• Digital Class Resource
-        </p>
-
-      </div>
-
-
-      <div className="video-container">
-
-        <iframe
-          src={embedUrl}
-          title={video.title}
-          allow="autoplay; encrypted-media; fullscreen"
-          allowFullScreen
-        />
-
-      </div>
-
-
-      <div className="post-footer-actions">
-
+    <div className="inauguration-section">
+      <div className="separator" style={{ clear: 'both', textAlign: 'center', marginBottom: '20px' }}>
         <a
-          href={video.drive}
+          href="https://blogger.googleusercontent.com/img/a/AVvXsEgvLVSX1NBq89quY36RhXlu7tjYurt-33-lju24Z3O2z1Hl-_4wswl46razYp7aBWES_9RyYLDVajW_XBletE95xjSFqzMTxUhKAsme0ULiPgH1AQ0MBT7fDfF4pXpIK2huSx5OTiAa5a0u4oElWzaJ8q8UVA9dmCSxKPaw-P92NIakylzEo66b6z6Fw5EJ"
+          style={{ marginLeft: '1em', marginRight: '1em' }}
           target="_blank"
-          rel="noreferrer"
-          className="watch"
-          style={{
-            padding:
-              '11px 20px',
-
-            borderRadius:
-              '999px',
-
-            background:
-              '#8d005f',
-
-            color: '#fff',
-
-            textDecoration:
-              'none',
-
-            fontWeight: '700',
-
-            fontSize:
-              '14px',
-
-            display:
-              'inline-flex',
-
-            alignItems:
-              'center',
-
-            gap:
-              '6px'
-          }}
+          rel="noopener noreferrer"
         >
-          ↗ Open in Google Drive
+          <img
+            alt="Gurukulam Banner"
+            height="100"
+            src="https://blogger.googleusercontent.com/img/a/AVvXsEgvLVSX1NBq89quY36RhXlu7tjYurt-33-lju24Z3O2z1Hl-_4wswl46razYp7aBWES_9RyYLDVajW_XBletE95xjSFqzMTxUhKAsme0ULiPgH1AQ0MBT7fDfF4pXpIK2huSx5OTiAa5a0u4oElWzaJ8q8UVA9dmCSxKPaw-P92NIakylzEo66b6z6Fw5EJ"
+            width="320"
+            style={{ maxWidth: '100%', height: 'auto' }}
+          />
         </a>
+      </div>
 
-
-        <div className="nav-buttons">
-
-          <button
-            disabled={!prevVideo}
-            onClick={() =>
-              prevVideo &&
-              navg(
-                `${basePath}/${prevVideo.id}`
-              )
-            }
+      <div className={`stage ${isOpen ? 'open' : ''}`} ref={stageRef}>
+        <div className="valance"></div>
+        <div className="curtain left"></div>
+        <div className="curtain right"></div>
+        <canvas
+          ref={canvasRef}
+          style={{ height: '100%', inset: 0, pointerEvents: 'none', position: 'absolute', width: '100%', zIndex: 6 }}
+        ></canvas>
+        <div className="tie tl"></div>
+        <div className="tie tr"></div>
+        <div aria-live="polite" className="stage-text" style={{ marginTop: '-80px' }}>
+          <h1 className="t1" style={{ fontWeight: 400 }}>
+            <br />
+            Inauguration of
+            <br /> Gurukulam Digital Classes
+          </h1>
+          <p className="by">By</p>
+          <p className="name">Sri.&nbsp; M. M. NAYAK, IAS</p>
+          <p className="desig">Hon’ble Principal Secretary , TW Dept</p>
+          <p className="name">Smt. M.Gowthami, IAS</p>
+          <p className="desig">Secretary, Gurukulam</p>
+          <p className="date">
+            On 5<sup>th</sup> October&nbsp; 2026
+          </p>
+          <a
+            className="blog"
+            href="https://apgurukulamdigitalclasses.vercel.app"
+            rel="noopener noreferrer"
+            target="_blank"
           >
-            ← Previous Lesson
-          </button>
-
-
-          <button
-            disabled={!nextVideo}
-            onClick={() =>
-              nextVideo &&
-              navg(
-                `${basePath}/${nextVideo.id}`
-              )
-            }
-          >
-            Next Lesson →
-          </button>
-
+            Visit Gurukulam Digital Classes →
+          </a>
         </div>
-
       </div>
 
+      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+        <button className="curtain-btn" type="button" onClick={toggleCurtain}>
+          {isOpen ? 'Close Curtain' : 'Open Curtain'}
+        </button>
+      </div>
     </div>
-
   );
 }
-
-
-/* =========================================================
-   PLACEHOLDER PAGE
-========================================================= */
-
-function Placeholder({
-  name
-}) {
-
-  return (
-
-    <section className="placeholder">
-
-      <div className="badge">
-        COMING LATER
-      </div>
-
-
-      <h1>
-        {name}
-      </h1>
-
-
-      <p>
-        The {name} page is reserved for the
-        content migration. Its lessons, videos
-        and links can be added without changing
-        the site structure.
-      </p>
-
-    </section>
-
-  );
-}
-
-
-/* =========================================================
-   GURUKULAM MAGAZINE
-========================================================= */
-
-function GurukulamMagazine() {
-
-  return (
-
-    <div
-      style={{
-        display:
-          'flex',
-
-        flexDirection:
-          'column',
-
-        alignItems:
-          'center',
-
-        padding:
-          '32px 16px',
-
-        minHeight:
-          '80vh'
-      }}
-    >
-
-      <section
-        className="pagehead"
-        style={{
-          marginBottom:
-            '24px',
-
-          width:
-            '100%',
-
-          maxWidth:
-            '960px'
-        }}
-      >
-
-        <span>
-          APTWREI SOCIETY
-        </span>
-
-
-        <h1>
-          📰 GURUKULAM MAGAZINE
-        </h1>
-
-
-        <p>
-          Monthly publication featuring
-          student achievements, academic
-          articles &amp; school events
-        </p>
-
-      </section>
-
-
-      <div
-        style={{
-          display:
-            'flex',
-
-          gap:
-            '12px',
-
-          marginBottom:
-            '24px'
-        }}
-      >
-
-        <a
-          href="/gurukulam-magazine.pdf"
-          target="_blank"
-          rel="noreferrer"
-          style={{
-            padding:
-              '10px 22px',
-
-            borderRadius:
-              '999px',
-
-            background:
-              '#8d005f',
-
-            color:
-              '#fff',
-
-            textDecoration:
-              'none',
-
-            fontWeight:
-              '700',
-
-            fontSize:
-              '14px',
-
-            display:
-              'inline-flex',
-
-            alignItems:
-              'center',
-
-            gap:
-              '8px',
-
-            boxShadow:
-              '0 4px 14px rgba(141,0,95,0.35)'
-          }}
-        >
-          ↗ Open in New Tab
-        </a>
-
-
-        <a
-          href="/gurukulam-magazine.pdf"
-          download="Gurukulam-Magazine.pdf"
-          style={{
-            padding:
-              '10px 22px',
-
-            borderRadius:
-              '999px',
-
-            background:
-              '#ffffff',
-
-            color:
-              '#1a1a2e',
-
-            textDecoration:
-              'none',
-
-            fontWeight:
-              '700',
-
-            fontSize:
-              '14px',
-
-            display:
-              'inline-flex',
-
-            alignItems:
-              'center',
-
-            gap:
-              '8px',
-
-            border:
-              '2px solid #8d005f',
-
-            boxShadow:
-              '0 4px 14px rgba(0,0,0,0.15)'
-          }}
-        >
-          ⬇ Download PDF
-        </a>
-
-      </div>
-
-
-      <div
-        style={{
-          width:
-            '100%',
-
-          maxWidth:
-            '960px',
-
-          borderRadius:
-            '16px',
-
-          overflow:
-            'hidden',
-
-          boxShadow:
-            '0 8px 40px rgba(0,0,0,0.5)',
-
-          border:
-            '1px solid rgba(255,255,255,0.12)',
-
-          background:
-            '#1a1a2e'
-        }}
-      >
-
-        <iframe
-          src="/gurukulam-magazine.pdf"
-          title="Gurukulam Magazine"
-          width="100%"
-          height="820px"
-          style={{
-            display:
-              'block',
-
-            border:
-              'none'
-          }}
-        />
-
-      </div>
-
-    </div>
-
-  );
-}
-
-
-/* =========================================================
-   APP ROUTER
-========================================================= */
-
-function App() {
-
-  const loc = useLocation();
-
-  const p =
-    loc.pathname;
-
-
-  const mathPostMatch =
-    p.match(
-      /^\/mathematics\/(\d+)$/
-    );
-
-  const phyPostMatch =
-    p.match(
-      /^\/physics\/(\d+)$/
-    );
-
-  const socialPostMatch =
-    p.match(
-      /^\/social\/(\d+)$/
-    );
-
-
-  let content;
-
-
-  if (
-    p === '/' ||
-    p === ''
-  ) {
-
-    content =
-      <Home />;
-
-  }
-
-
-  else if (mathPostMatch) {
-
-    content = (
-
-      <PostDetail
-        videos={mathVideos}
-        basePath="/mathematics"
-        subject="Mathematics"
-        badgeLabel="10TH CLASS • MATHEMATICS"
-      />
-
-    );
-
-  }
-
-
-  else if (
-    p === '/mathematics' ||
-    p === '/p/blog-page_18.html'
-  ) {
-
-    content =
-      <Mathematics />;
-
-  }
-
-
-  else if (phyPostMatch) {
-
-    content = (
-
-      <PostDetail
-        videos={physicsVideos}
-        basePath="/physics"
-        subject="Physical Science"
-        badgeLabel="10TH CLASS • PHYSICAL SCIENCE"
-      />
-
-    );
-
-  }
-
-
-  else if (
-    p === '/physics' ||
-    p === '/p/phy-science.html'
-  ) {
-
-    content =
-      <PhysicalScience />;
-
-  }
-
-
-  else if (socialPostMatch) {
-
-    content = (
-
-      <PostDetail
-        videos={socialVideos}
-        basePath="/social"
-        subject="Social Studies"
-        badgeLabel="10TH CLASS • SOCIAL STUDIES"
-      />
-
-    );
-
-  }
-
-
-  else if (
-    p === '/social' ||
-    p === '/p/social.html'
-  ) {
-
-    content =
-      <SocialStudies />;
-
-  }
-
-
-  else if (
-    p === '/biology' ||
-    p === '/biological-science'
-  ) {
-
-    content = (
-
-      <Placeholder
-        name="Biological Science"
-      />
-
-    );
-
-  }
-
-
-  else if (
-    p === '/magazine'
-  ) {
-
-    content =
-      <GurukulamMagazine />;
-
-  }
-
-
-  else {
-
-    content = (
-
-      <Placeholder
-        name="Social Studies"
-      />
-
-    );
-
-  }
-
-
-  return (
-
-    <Layout>
-      {content}
-    </Layout>
-
-  );
-}
-
-
-/* =========================================================
-   START REACT APPLICATION
-========================================================= */
-
-createRoot(
-  document.getElementById('root')
-).render(
-
-  <BrowserRouter>
-
-    <App />
-
-  </BrowserRouter>
-
-);
