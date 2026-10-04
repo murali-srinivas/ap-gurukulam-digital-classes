@@ -15,11 +15,7 @@ const getChapters = (videos) => [
 
 /* ── Dropdown Nav config ── */
 const navConfig = [
-  {
-    label: 'Home',
-    path: '/',
-    chapters: []
-  },
+  { label: 'Home', path: '/', chapters: [] },
   {
     label: 'Mathematics',
     path: '/mathematics',
@@ -30,11 +26,7 @@ const navConfig = [
     path: '/physics',
     chapters: getChapters(physicsVideos)
   },
-  {
-    label: 'Bio Science',
-    path: '/biology',
-    chapters: []
-  },
+  { label: 'Bio Science', path: '/biology', chapters: [] },
   {
     label: 'Social',
     path: '/social',
@@ -119,7 +111,6 @@ function NavBar() {
                           ? path
                           : `${path}?chapter=${encodeURIComponent(ch)}`
                       );
-
                       setOpenMenu(null);
                     }}
                   >
@@ -138,11 +129,7 @@ function NavBar() {
 }
 
 /* ── Chapter Filter Pills ── */
-function ChapterFilter({
-  chapters,
-  active,
-  onChange
-}) {
+function ChapterFilter({ chapters, active, onChange }) {
   return (
     <div className="chapter-filter">
       {chapters.map(ch => (
@@ -265,15 +252,12 @@ function Layout({ children }) {
         </div>
       </header>
 
-      {/* ── Navigation ── */}
       <NavBar />
 
-      {/* ── Main Content ── */}
       <main>
         {children}
       </main>
 
-      {/* ── Footer ── */}
       <footer>
         APTWREI Society (Gurukulam), Amaravati
         <span>•</span>
@@ -285,11 +269,7 @@ function Layout({ children }) {
 }
 
 /* ── Video grid shared component ── */
-function VideoGrid({
-  videos,
-  basePath,
-  subject
-}) {
+function VideoGrid({ videos, basePath, subject }) {
   const loc = useLocation();
   const navg = useNavigate();
 
@@ -335,7 +315,6 @@ function VideoGrid({
         v => v.chapter === activeChapter
       );
 
-  /* Group by chapter */
   const grouped = filtered.reduce(
     (acc, v) => {
       (acc[v.chapter] =
@@ -380,7 +359,7 @@ function VideoGrid({
 
             <div className="grid">
 
-              {vids.map((v, i) => {
+              {vids.map(v => {
 
                 const globalIndex =
                   videos.findIndex(
@@ -464,9 +443,9 @@ function Home() {
     <>
       <Inauguration />
 
-      {/* ─────────────────────────────────────
-          WELCOME / HERO BOX
-          ───────────────────────────────────── */}
+      {/* ─────────────────────────────────────────
+          WELCOME TO GURUKULAM DIGITAL CLASSES
+          ───────────────────────────────────────── */}
       <section
         className="hero"
         style={{
@@ -475,7 +454,7 @@ function Home() {
         }}
       >
 
-        {/* ── Small image at top-left corner ── */}
+        {/* ── Small image: TOP LEFT ── */}
         <img
           src="/minister.jpg"
           alt="Gurukulam"
@@ -491,6 +470,23 @@ function Home() {
           }}
         />
 
+        {/* ── Small image: TOP RIGHT ── */}
+        <img
+          src="/prinsecy.png"
+          alt="Gurukulam"
+          style={{
+            position: 'absolute',
+            top: '15px',
+            right: '15px',
+            width: '55px',
+            height: '55px',
+            objectFit: 'contain',
+            borderRadius: '8px',
+            zIndex: 2
+          }}
+        />
+
+        {/* ── Hero Content ── */}
         <div className="badge">
           DIGITAL LEARNING PLATFORM
         </div>
