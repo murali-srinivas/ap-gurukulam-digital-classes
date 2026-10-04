@@ -367,11 +367,11 @@ export default function Inauguration() {
           </p>
           <a
             className="blog"
-            href="https://apgurukulamdigitalclasses.vercel.app/physics"
+            href="https://apgurukulamdigitalclasses.vercel.app"
             rel="noopener noreferrer"
             target="_blank"
           >
-            Visit Gurukulam Digital Classes Blog →
+            Visit Gurukulam Digital Classes →
           </a>
         </div>
       </div>
