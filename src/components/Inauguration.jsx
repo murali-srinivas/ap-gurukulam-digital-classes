@@ -1376,7 +1376,7 @@ export default function Inauguration() {
           <p className="name">Smt. M.Gowthami, IAS</p>
           <p className="desig">Secretary, Gurukulam</p>
           <p className="date">
-            On 5<sup>th</sup> October&nbsp; 2026
+            On 6<sup>th</sup> October&nbsp; 2026
           </p>
           <a
             className="blog"
