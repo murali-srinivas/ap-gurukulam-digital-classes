@@ -826,8 +826,8 @@ function Home() {
 
 
         <div className="note">
-          Biology page will be added when its
-          Blogger content is migrated.
+          <h2>Life Process</h2>
+          <iframe src="https://drive.google.com/file/d/1uguTqjj9dbWULThtl6dbT-kp5L-xLHQO/preview" width="640" height="480" allow="autoplay" style={{ border: 0 }}></iframe>
         </div>
 
       </section>
