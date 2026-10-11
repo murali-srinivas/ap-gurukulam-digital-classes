@@ -48,7 +48,7 @@ const navConfig = [
   {
     label: 'Bio Science',
     path: '/biology',
-    chapters: ['Life Process']
+    chapters: getChapters(biology Videos)
   },
   {
     label: 'Social',
