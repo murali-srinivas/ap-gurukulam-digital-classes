@@ -827,7 +827,7 @@ function Home() {
 
         <div className="note">
           <h2>Life Process</h2>
-          <iframe src="https://drive.google.com/file/d/1uguTqjj9dbWULThtl6dbT-kp5L-xLHQO/preview" width="640" height="480" allow="autoplay" style={{ border: 0 }}></iframe>
+          <iframe src="https://drive.google.com/file/d/16lHriNaRy3wU9ad5RP0epFc-vHnrS51D/view?usp=sharing" width="640" height="480" allow="autoplay" style={{ border: 0 }}></iframe>
         </div>
 
       </section>
