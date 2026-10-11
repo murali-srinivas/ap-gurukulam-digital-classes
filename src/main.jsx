@@ -11,6 +11,7 @@ import './styles.css';
 import { mathVideos } from './data/mathematics';
 import { physicsVideos } from './data/physics';
 import { socialVideos } from './data/social';
+import { biologyVideos } from './data/biology';
 
 import Inauguration from './components/Inauguration';
 
