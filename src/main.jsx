@@ -48,7 +48,7 @@ const navConfig = [
   {
     label: 'Bio Science',
     path: '/biology',
-    chapters: []
+    chapters: ['Life Process']
   },
   {
     label: 'Social',
