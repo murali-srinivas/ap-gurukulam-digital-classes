@@ -1371,7 +1371,7 @@ export default function Inauguration() {
             <br /> Gurukulam Digital Classes
           </h1>
           <p className="by">By</p>
-          <p className="name">Sri.&nbsp; D Murali Krishna Reddy, IAS</p>
+          <p className="name">Sri.&nbsp; D Muralidhar  Reddy, IAS</p>
           <p className="desig">Hon’ble Secretary , TW Dept</p>
           <p className="name">Smt. M.Gowthami, IAS</p>
           <p className="desig">Secretary, Gurukulam</p>
