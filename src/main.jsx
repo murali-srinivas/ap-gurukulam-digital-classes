@@ -735,7 +735,7 @@ function Home() {
         =============================================== */}
 
         <img
-          src="/secretary tw.png"
+          src="/secretary tw.jpg"
           alt="Gurukulam"
           style={{
             position: 'absolute',
