@@ -49,7 +49,7 @@ const navConfig = [
   {
     label: 'Bio Science',
     path: '/biology',
-    chapters: ['Life Process']
+    chapters: getChapters(biologyVideos)
   },
   {
     label: 'Social',
@@ -244,6 +244,11 @@ function Layout({ children }) {
         /^\/physics\/(\d+)$/
       );
 
+    const bioPostMatch =
+      loc.pathname.match(
+        /^\/biology\/(\d+)$/
+      );
+
     const socialPostMatch =
       loc.pathname.match(
         /^\/social\/(\d+)$/
@@ -281,6 +286,23 @@ function Layout({ children }) {
       document.title = v
         ? `AP-GURUKULAM: ${v.title}`
         : 'AP-GURUKULAM-DIGITAL CLASSES: Physical Science';
+
+    }
+
+    else if (bioPostMatch) {
+
+      const v = biologyVideos.find(
+        v =>
+          v.id ===
+          parseInt(
+            bioPostMatch[1],
+            10
+          )
+      );
+
+      document.title = v
+        ? `AP-GURUKULAM: ${v.title}`
+        : 'AP-GURUKULAM-DIGITAL CLASSES: Biological Science';
 
     }
 
@@ -814,6 +836,18 @@ function Home() {
 
           <button
             onClick={() =>
+              navg('/biology')
+            }
+            style={{
+              background: '#2e7d32'
+            }}
+          >
+            Explore Biological Science →
+          </button>
+
+
+          <button
+            onClick={() =>
               navg('/social')
             }
             style={{
@@ -943,6 +977,45 @@ function SocialStudies() {
         videos={socialVideos}
         basePath="/social"
         subject="Social Studies"
+      />
+
+    </>
+
+  );
+}
+
+
+/* =========================================================
+   BIOLOGICAL SCIENCE PAGE
+========================================================= */
+
+function Biology() {
+
+  return (
+
+    <>
+
+      <section className="pagehead">
+
+        <span>
+          CLASS 10
+        </span>
+
+        <h1>
+          BIOLOGICAL SCIENCE VIDEOS
+        </h1>
+
+        <p>
+          Observe • Discover • Excel
+        </p>
+
+      </section>
+
+
+      <VideoGrid
+        videos={biologyVideos}
+        basePath="/biology"
+        subject="Biological Science"
       />
 
     </>
@@ -1447,6 +1520,11 @@ function App() {
       /^\/physics\/(\d+)$/
     );
 
+  const bioPostMatch =
+    p.match(
+      /^\/biology\/(\d+)$/
+    );
+
   const socialPostMatch =
     p.match(
       /^\/social\/(\d+)$/
@@ -1548,18 +1626,30 @@ function App() {
   }
 
 
-  else if (
-    p === '/biology' ||
-    p === '/biological-science'
-  ) {
+  else if (bioPostMatch) {
 
     content = (
 
-      <Placeholder
-        name="Biological Science"
+      <PostDetail
+        videos={biologyVideos}
+        basePath="/biology"
+        subject="Biological Science"
+        badgeLabel="10TH CLASS • BIOLOGICAL SCIENCE"
       />
 
     );
+
+  }
+
+
+  else if (
+    p === '/biology' ||
+    p === '/biological-science' ||
+    p === '/p/biological-science.html'
+  ) {
+
+    content =
+      <Biology />;
 
   }
 

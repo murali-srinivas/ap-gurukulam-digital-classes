@@ -1371,12 +1371,12 @@ export default function Inauguration() {
             <br /> Gurukulam Digital Classes
           </h1>
           <p className="by">By</p>
-          <p className="name">Sri.&nbsp; M. M. NAYAK, IAS</p>
-          <p className="desig">Hon’ble Principal Secretary , TW Dept</p>
+          <p className="name">Sri.&nbsp; D Murali Krishna Reddy, IAS</p>
+          <p className="desig">Hon’ble Secretary , TW Dept</p>
           <p className="name">Smt. M.Gowthami, IAS</p>
           <p className="desig">Secretary, Gurukulam</p>
           <p className="date">
-            On 12<sup>th</sup> October&nbsp; 2026
+            On 13<sup>th</sup> October&nbsp; 2026
           </p>
           <a
             className="blog"
