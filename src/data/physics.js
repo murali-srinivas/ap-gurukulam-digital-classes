@@ -19,4 +19,5 @@ export const physicsVideos = [
   { id: 18, chapter: 'Reflection & Refraction', title: 'Images in Mirrors-1', drive: 'https://drive.google.com/file/d/1UIuDCcUmz9oTn3JY4e9p2yPES17QL6eM/view?usp=drive_link' },
   { id: 19, chapter: 'Reflection & Refraction', title: 'Images in Mirrors-2', drive: 'https://drive.google.com/file/d/12UMlmncLydOCSzB9L0KP3urx5K10xBAq/view?usp=drive_link' },
   { id: 20, chapter: 'Reflection & Refraction', title: 'Images in lenses', drive: 'https://drive.google.com/file/d/1UIuDCcUmz9oTn3JY4e9p2yPES17QL6eM/view?usp=drive_link' },
+  { id: 21, chapter: 'Electricity', title: 'Electricity-1', drive: 'https://drive.google.com/file/d/1o84tB0IwdV8-N89u8V8-9h5x8VTg8W0E/view?usp=drive_link' },
 ];
