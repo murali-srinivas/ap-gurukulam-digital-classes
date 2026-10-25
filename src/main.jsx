@@ -743,6 +743,54 @@ function Home() {
 
   const navg = useNavigate();
 
+  const subjectCards = [
+    {
+      title: 'English',
+      icon: '📚',
+      path: '/english',
+      color: '#4338ca',
+      tagline: 'Prose, Poetry, Reading & Grammar',
+      count: englishVideos.length,
+      chapters: getChapters(englishVideos).length - 1
+    },
+    {
+      title: 'Mathematics',
+      icon: '📐',
+      path: '/mathematics',
+      color: '#8d005f',
+      tagline: 'Real Numbers, Sets, Polynomials & Trigonometry',
+      count: mathVideos.length,
+      chapters: getChapters(mathVideos).length - 1
+    },
+    {
+      title: 'Physical Science',
+      icon: '⚡',
+      path: '/physics',
+      color: '#9f7f27',
+      tagline: 'Metals, Acids, Optics & Electromagnetism',
+      count: physicsVideos.length,
+      chapters: getChapters(physicsVideos).length - 1
+    },
+    {
+      title: 'Biological Science',
+      icon: '🧬',
+      path: '/biology',
+      color: '#2e7d32',
+      tagline: 'Life Processes, Nutrition & Control',
+      count: biologyVideos.length,
+      chapters: getChapters(biologyVideos).length - 1
+    },
+    {
+      title: 'Social Studies',
+      icon: '🌍',
+      path: '/social',
+      color: '#007f9f',
+      tagline: 'Geography, Economics & Map Pointing',
+      count: socialVideos.length,
+      chapters: getChapters(socialVideos).length - 1
+    }
+  ];
+
   return (
 
     <>
@@ -851,7 +899,7 @@ function Home() {
 
         <p>
           Digital learning resources for 10th Class
-          students in Mathematics, Physical Science,
+          students in English, Mathematics, Physical Science,
           Biological Science and Social Studies.
         </p>
 
@@ -865,6 +913,18 @@ function Home() {
             justifyContent: 'center'
           }}
         >
+
+          <button
+            onClick={() =>
+              navg('/english')
+            }
+            style={{
+              background: '#4338ca'
+            }}
+          >
+            Explore English →
+          </button>
+
 
           <button
             onClick={() =>
@@ -914,6 +974,220 @@ function Home() {
 
 
       </section>
+
+
+      {/* =================================================
+          10TH CLASS SUBJECTS OVERVIEW
+      ================================================= */}
+
+      <section
+        className="home-subjects"
+        style={{
+          marginTop: '36px'
+        }}
+      >
+
+        <div
+          style={{
+            textAlign: 'center',
+            marginBottom: '24px'
+          }}
+        >
+
+          <h2
+            style={{
+              font: '700 clamp(22px, 3.2vw, 32px) Georgia, serif',
+              color: '#241b16',
+              margin: '0 0 8px'
+            }}
+          >
+            Class 10 Digital Learning Modules
+          </h2>
+
+          <p
+            style={{
+              color: '#765f53',
+              margin: 0,
+              fontSize: '16px'
+            }}
+          >
+            Select any subject below to explore digital video lessons, topic breakdown and study materials
+          </p>
+
+        </div>
+
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+            gap: '18px'
+          }}
+        >
+
+          {subjectCards.map(s => (
+
+            <div
+              key={s.path}
+              className="subject-card"
+              onClick={() =>
+                navg(s.path)
+              }
+              style={{
+                background: '#ffffff',
+                border: '1px solid #eadfd4',
+                borderRadius: '16px',
+                padding: '20px 18px',
+                cursor: 'pointer',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                boxShadow: '0 4px 14px rgba(75, 44, 27, 0.06)'
+              }}
+            >
+
+              <div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '14px'
+                  }}
+                >
+
+                  <span
+                    style={{
+                      fontSize: '32px'
+                    }}
+                  >
+                    {s.icon}
+                  </span>
+
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: '700',
+                      background: `${s.color}18`,
+                      color: s.color,
+                      padding: '4px 10px',
+                      borderRadius: '999px',
+                      border: `1px solid ${s.color}33`
+                    }}
+                  >
+                    {s.chapters} Chapters
+                  </span>
+
+                </div>
+
+
+                <h3
+                  style={{
+                    font: '700 20px Georgia, serif',
+                    color: '#241b16',
+                    margin: '0 0 6px'
+                  }}
+                >
+                  {s.title}
+                </h3>
+
+
+                <p
+                  style={{
+                    fontSize: '13px',
+                    color: '#765f53',
+                    margin: '0 0 16px',
+                    lineHeight: '1.45'
+                  }}
+                >
+                  {s.tagline}
+                </p>
+
+              </div>
+
+
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingTop: '12px',
+                  borderTop: '1px solid #f1e7d8'
+                }}
+              >
+
+                <span
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    color: '#89786d'
+                  }}
+                >
+                  {s.count} Video{s.count !== 1 ? 's' : ''}
+                </span>
+
+                <span
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    color: s.color,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  Open →
+                </span>
+
+              </div>
+
+            </div>
+
+          ))}
+
+        </div>
+
+      </section>
+
+    </>
+
+  );
+}
+
+
+/* =========================================================
+   ENGLISH PAGE
+========================================================= */
+
+function English() {
+
+  return (
+
+    <>
+
+      <section className="pagehead">
+
+        <span>
+          CLASS 10
+        </span>
+
+        <h1>
+          ENGLISH VIDEOS
+        </h1>
+
+        <p>
+          Read • Express • Excel
+        </p>
+
+      </section>
+
+
+      <VideoGrid
+        videos={englishVideos}
+        basePath="/english"
+        subject="English"
+      />
 
     </>
 
