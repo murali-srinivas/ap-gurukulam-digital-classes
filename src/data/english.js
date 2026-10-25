@@ -1,27 +1,9 @@
 export const englishVideos = [
   {
-    id: 1,
-    chapter: 'Personality Development',
-    title: 'Attitude Is Altitude',
-    drive: ''
-  },
-  {
-    id: 2,
-    chapter: 'Personality Development',
-    title: 'Every Success Story Is also a Story of Great Failures',
-    drive: ''
-  },
-  {
-    id: 3,
-    chapter: 'Personality Development',
-    title: 'I Will Do It',
-    drive: ''
-  },
-  {
     id: 4,
-    chapter: 'Wit and Humour',
-    title: 'The Dear Departed (Part 1)',
-    drive: ''
+    chapter: 'From the Diary of Anne Frank',
+    title: 'Amanda',
+    drive: 'https://drive.google.com/file/d/1U3KMESX5TzVOo4mOPfV04hhzhqtEnL1G/view?usp=drive_link'
   },
   {
     id: 5,
