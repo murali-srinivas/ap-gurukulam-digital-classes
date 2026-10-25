@@ -8,6 +8,7 @@ import {
 
 import './styles.css';
 
+import { englishVideos } from './data/english';
 import { mathVideos } from './data/mathematics';
 import { physicsVideos } from './data/physics';
 import { socialVideos } from './data/social';
@@ -35,6 +36,11 @@ const navConfig = [
     label: 'Home',
     path: '/',
     chapters: []
+  },
+  {
+    label: 'English',
+    path: '/english',
+    chapters: getChapters(englishVideos)
   },
   {
     label: 'Mathematics',
@@ -234,6 +240,11 @@ function Layout({ children }) {
 
   useEffect(() => {
 
+    const englishPostMatch =
+      loc.pathname.match(
+        /^\/english\/(\d+)$/
+      );
+
     const mathPostMatch =
       loc.pathname.match(
         /^\/mathematics\/(\d+)$/
@@ -255,7 +266,24 @@ function Layout({ children }) {
       );
 
 
-    if (mathPostMatch) {
+    if (englishPostMatch) {
+
+      const v = englishVideos.find(
+        v =>
+          v.id ===
+          parseInt(
+            englishPostMatch[1],
+            10
+          )
+      );
+
+      document.title = v
+        ? `AP-GURUKULAM: ${v.title}`
+        : 'AP-GURUKULAM-DIGITAL CLASSES: English';
+
+    }
+
+    else if (mathPostMatch) {
 
       const v = mathVideos.find(
         v =>
@@ -320,6 +348,16 @@ function Layout({ children }) {
       document.title = v
         ? `AP-GURUKULAM: ${v.title}`
         : 'AP-GURUKULAM-DIGITAL CLASSES: Social Studies';
+
+    }
+
+    else if (
+      loc.pathname === '/english' ||
+      loc.pathname === '/p/english.html'
+    ) {
+
+      document.title =
+        'AP-GURUKULAM-DIGITAL CLASSES: English';
 
     }
 
@@ -652,13 +690,28 @@ function VideoGrid({
                         </button>
 
 
-                        <a
-                          href={v.drive}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          ↗ Open Drive
-                        </a>
+                        {v.drive ? (
+                          <a
+                            href={v.drive}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            ↗ Open Drive
+                          </a>
+                        ) : (
+                          <span
+                            style={{
+                              padding: '9px 13px',
+                              borderRadius: '9px',
+                              border: '1px solid #eadfd4',
+                              color: '#a09085',
+                              fontSize: '13px',
+                              fontWeight: '600'
+                            }}
+                          >
+                            Drive Pending
+                          </span>
+                        )}
 
                       </div>
 

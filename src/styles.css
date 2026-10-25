@@ -429,5 +429,15 @@
   .nav-dropdown { min-width: 190px; }
 }
 
+/* ── Home Page Subject Cards ── */
+.subject-card {
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.subject-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(75, 44, 27, 0.12) !important;
+  border-color: #d0b8a0 !important;
+}
+
 
 
