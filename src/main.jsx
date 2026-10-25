@@ -1477,7 +1477,7 @@ function PostDetail({
         <p>
           Lesson{' '}
           {String(
-            video.id
+            videoIndex + 1
           ).padStart(
             2,
             '0'
@@ -1492,55 +1492,113 @@ function PostDetail({
 
       <div className="video-container">
 
-        <iframe
-          src={embedUrl}
-          title={video.title}
-          allow="autoplay; encrypted-media; fullscreen"
-          allowFullScreen
-        />
+        {embedUrl ? (
+          <iframe
+            src={embedUrl}
+            title={video.title}
+            allow="autoplay; encrypted-media; fullscreen"
+            allowFullScreen
+          />
+        ) : (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff',
+              padding: '24px',
+              textAlign: 'center',
+              background: 'radial-gradient(circle at center, #2e1d27, #130a10)'
+            }}
+          >
+            <span style={{ fontSize: '48px', marginBottom: '12px' }}>🎬</span>
+            <h3 style={{ margin: '0 0 8px', font: '700 22px Georgia, serif', color: '#f8eee4' }}>
+              Video Resource Coming Soon
+            </h3>
+            <p style={{ margin: 0, color: '#b8a69b', fontSize: '14px', maxWidth: '420px' }}>
+              The digital class recording for &ldquo;{video.title}&rdquo; is currently being prepared and will be uploaded shortly.
+            </p>
+          </div>
+        )}
 
       </div>
 
 
       <div className="post-footer-actions">
 
-        <a
-          href={video.drive}
-          target="_blank"
-          rel="noreferrer"
-          className="watch"
-          style={{
-            padding:
-              '11px 20px',
+        {video.drive ? (
+          <a
+            href={video.drive}
+            target="_blank"
+            rel="noreferrer"
+            className="watch"
+            style={{
+              padding:
+                '11px 20px',
 
-            borderRadius:
-              '999px',
+              borderRadius:
+                '999px',
 
-            background:
-              '#8d005f',
+              background:
+                '#8d005f',
 
-            color: '#fff',
+              color: '#fff',
 
-            textDecoration:
-              'none',
+              textDecoration:
+                'none',
 
-            fontWeight: '700',
+              fontWeight: '700',
 
-            fontSize:
-              '14px',
+              fontSize:
+                '14px',
 
-            display:
-              'inline-flex',
+              display:
+                'inline-flex',
 
-            alignItems:
-              'center',
+              alignItems:
+                'center',
 
-            gap:
-              '6px'
-          }}
-        >
-          ↗ Open in Google Drive
-        </a>
+              gap:
+                '6px'
+            }}
+          >
+            ↗ Open in Google Drive
+          </a>
+        ) : (
+          <span
+            style={{
+              padding:
+                '11px 20px',
+
+              borderRadius:
+                '999px',
+
+              background:
+                '#eadfd4',
+
+              color: '#89786d',
+
+              fontWeight: '700',
+
+              fontSize:
+                '14px',
+
+              display:
+                'inline-flex',
+
+              alignItems:
+                'center',
+
+              gap:
+                '6px'
+            }}
+          >
+            Drive Link Coming Soon
+          </span>
+        )}
 
 
         <div className="nav-buttons">
@@ -1837,6 +1895,11 @@ function App() {
     loc.pathname;
 
 
+  const englishPostMatch =
+    p.match(
+      /^\/english\/(\d+)$/
+    );
+
   const mathPostMatch =
     p.match(
       /^\/mathematics\/(\d+)$/
@@ -1868,6 +1931,33 @@ function App() {
 
     content =
       <Home />;
+
+  }
+
+
+  else if (englishPostMatch) {
+
+    content = (
+
+      <PostDetail
+        videos={englishVideos}
+        basePath="/english"
+        subject="English"
+        badgeLabel="10TH CLASS • ENGLISH"
+      />
+
+    );
+
+  }
+
+
+  else if (
+    p === '/english' ||
+    p === '/p/english.html'
+  ) {
+
+    content =
+      <English />;
 
   }
 
