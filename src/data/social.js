@@ -5,4 +5,5 @@ export const socialVideos = [
   { id: 4, chapter: 'Economics', title: 'Sectors of Indian Economy', drive: 'https://drive.google.com/file/d/1LS4ylGZZUAnRJasFAdT_CtdhaVFDXfMl/view?usp=drive_link' },
   { id: 5, chapter: 'Economics', title: 'Sectors of Indian Economy-2', drive: 'https://drive.google.com/file/d/1i1pDuCHc-eBVL6qlyR05AAtBDnD92kC0/view?usp=drive_link' },
   { id: 7, chapter: 'Geography', title: 'Agriculture', drive: 'https://drive.google.com/file/d/19xwdvNULT0VhVBWo_2nwDAMmm0cvTsdY/view?usp=sharing' },
+  { id: 8, chapter: 'Map Pointing', title: 'India Map Pointing-2', drive: 'https://drive.google.com/file/d/1ff9pKZlxTPVgfvEyVKincPh2qh_RT3OM/view?usp=sharing' },
 ]
