@@ -22,4 +22,5 @@ export const physicsVideos = [
   { id: 21, chapter: 'Electricity', title: 'Electricity-1', drive: 'https://drive.google.com/file/d/1QS63A-tiDDN-5WjG1SWaUyOnlh-NjpJ5/view?usp=drive_link' },
   { id: 22, chapter: 'Electricity', title: 'Potential Difference', drive: 'https://drive.google.com/file/d/19foz48kcVFrMHl9ZHyfYq8P5Vu0VYMMt/view?usp=sharing' },
   { id: 23, chapter: 'Electricity', title: 'Ohms law', drive: 'https://drive.google.com/file/d/1ZdJQh4XmLhrkSnQFn2cFy04MDZ07hUKy/view?usp=drive_link' },
+  { id: 24, chapter: 'Electricity', title: 'Activity 11.2', drive: 'https://drive.google.com/file/d/1NhNxkLwUw9ciakjHNPbn5C9NHgX01TW5/view?usp=sharing' },
 ];
