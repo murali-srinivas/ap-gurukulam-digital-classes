@@ -9,4 +9,5 @@ export const mathVideos = [
   { id: 8, chapter: 'Circles', title: 'Circles-1', drive: 'https://drive.google.com/file/d/1qFtr6nyiQwPk9i9J9xP7bY_j_E_MOBwd/view?usp=drive_link' },
   { id: 9, chapter: 'Circles', title: 'Circles-2', drive: 'https://drive.google.com/file/d/1uEdFbDkMCJ9oe8NVPX5hvPQgK6y081DT/view?usp=drive_link' },
   { id: 10, chapter: 'Circles', title: 'Circles-3', drive: 'https://drive.google.com/file/d/1dV9HyxjAXrVbTU5Uya42LhxFLgCaMD0O/view?usp=drive_link' },
+  { id: 10, chapter: 'Quadratic Equations', title: 'Quadratic Eqns-1', drive: 'https://drive.google.com/file/d/130AO6QPq7QdtVKxM6CbfEdg5EbF3-OBF/view?usp=sharing' },
 ];
