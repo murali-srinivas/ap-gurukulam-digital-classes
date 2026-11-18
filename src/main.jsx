@@ -13,6 +13,7 @@ import { mathVideos } from './data/mathematics';
 import { physicsVideos } from './data/physics';
 import { socialVideos } from './data/social';
 import { biologyVideos } from './data/biology';
+import { magazineIssues } from './data/magazine';
 
 import Inauguration from './components/Inauguration';
 
@@ -65,7 +66,7 @@ const navConfig = [
   {
     label: 'Gurukulam Magazine',
     path: '/magazine',
-    chapters: []
+    chapters: getChapters(magazineIssues)
   }
 ];
 
@@ -265,6 +266,11 @@ function Layout({ children }) {
         /^\/social\/(\d+)$/
       );
 
+    const magazinePostMatch =
+      loc.pathname.match(
+        /^\/magazine\/(\d+)$/
+      );
+
 
     if (englishPostMatch) {
 
@@ -401,6 +407,32 @@ function Layout({ children }) {
 
       document.title =
         'AP-GURUKULAM-DIGITAL CLASSES: Social Studies';
+
+    }
+
+    else if (magazinePostMatch) {
+
+      const m = magazineIssues.find(
+        x =>
+          x.id ===
+          parseInt(
+            magazinePostMatch[1],
+            10
+          )
+      );
+
+      document.title = m
+        ? `AP-GURUKULAM: ${m.title}`
+        : 'AP-GURUKULAM-DIGITAL CLASSES: Gurukulam Magazine';
+
+    }
+
+    else if (
+      loc.pathname === '/magazine'
+    ) {
+
+      document.title =
+        'AP-GURUKULAM-DIGITAL CLASSES: Gurukulam Magazine';
 
     }
 
@@ -1679,6 +1711,78 @@ function Placeholder({
 
 function GurukulamMagazine() {
 
+  const loc = useLocation();
+  const navg = useNavigate();
+
+  const match =
+    loc.pathname.match(
+      /^\/magazine\/(\d+)$/
+    );
+
+  const routeId =
+    match
+      ? parseInt(match[1], 10)
+      : null;
+
+  const searchParams =
+    new URLSearchParams(loc.search);
+
+  const chapterParam =
+    searchParams.get('chapter') || 'All';
+
+  const chapters =
+    getChapters(magazineIssues);
+
+  const [activeChapter, setActiveChapter] =
+    useState(
+      chapters.includes(chapterParam)
+        ? chapterParam
+        : 'All'
+    );
+
+  useEffect(() => {
+    const ch =
+      new URLSearchParams(loc.search).get('chapter') || 'All';
+    setActiveChapter(
+      chapters.includes(ch) ? ch : 'All'
+    );
+  }, [loc.search]);
+
+  const filteredIssues =
+    activeChapter === 'All'
+      ? magazineIssues
+      : magazineIssues.filter(
+        m => m.chapter === activeChapter
+      );
+
+  const selectedIssue =
+    (routeId &&
+      magazineIssues.find(m => m.id === routeId)) ||
+    filteredIssues[0] ||
+    magazineIssues[0];
+
+  const handleChapterChange = (ch) => {
+    setActiveChapter(ch);
+    navg(
+      ch === 'All'
+        ? '/magazine'
+        : `/magazine?chapter=${encodeURIComponent(ch)}`
+    );
+  };
+
+  const rawSource =
+    selectedIssue?.pdf ||
+    selectedIssue?.drive ||
+    '/gurukulam-magazine.pdf';
+
+  const embedSrc =
+    selectedIssue?.drive && !selectedIssue?.pdf
+      ? selectedIssue.drive.replace(
+        /\/view(\?.*)?$/,
+        '/preview'
+      )
+      : rawSource;
+
   return (
 
     <div
@@ -1733,149 +1837,230 @@ function GurukulamMagazine() {
       </section>
 
 
-      <div
-        style={{
-          display:
-            'flex',
+      {chapters.length > 2 && (
+        <div style={{ width: '100%', maxWidth: '960px' }}>
+          <ChapterFilter
+            chapters={chapters}
+            active={activeChapter}
+            onChange={handleChapterChange}
+          />
+        </div>
+      )}
 
-          gap:
-            '12px',
 
-          marginBottom:
-            '24px'
-        }}
-      >
-
-        <a
-          href="/gurukulam-magazine.pdf"
-          target="_blank"
-          rel="noreferrer"
+      {filteredIssues.length > 1 && (
+        <div
+          className="grid"
           style={{
-            padding:
-              '10px 22px',
-
-            borderRadius:
-              '999px',
-
-            background:
-              '#8d005f',
-
-            color:
-              '#fff',
-
-            textDecoration:
-              'none',
-
-            fontWeight:
-              '700',
-
-            fontSize:
-              '14px',
-
-            display:
-              'inline-flex',
-
-            alignItems:
-              'center',
-
-            gap:
-              '8px',
-
-            boxShadow:
-              '0 4px 14px rgba(141,0,95,0.35)'
+            width: '100%',
+            maxWidth: '960px',
+            marginBottom: '28px'
           }}
         >
-          ↗ Open in New Tab
-        </a>
+          {filteredIssues.map((issue, idx) => {
+            const isSelected =
+              selectedIssue && selectedIssue.id === issue.id;
+            return (
+              <article
+                className="video-card"
+                key={issue.id}
+                style={{
+                  border: isSelected
+                    ? '2px solid #8d005f'
+                    : undefined
+                }}
+              >
+                <div className="number">
+                  {String(idx + 1).padStart(2, '0')}
+                </div>
+                <div>
+                  <h2
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => navg(`/magazine/${issue.id}`)}
+                  >
+                    {issue.title}
+                  </h2>
+                  <p>{issue.chapter}</p>
+                  <div className="card-actions">
+                    <button
+                      className="watch"
+                      onClick={() => navg(`/magazine/${issue.id}`)}
+                    >
+                      📖 Read Issue
+                    </button>
+                    {(issue.pdf || issue.drive) && (
+                      <a
+                        href={issue.pdf || issue.drive}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        ↗ Open
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
 
 
-        <a
-          href="/gurukulam-magazine.pdf"
-          download="Gurukulam-Magazine.pdf"
-          style={{
-            padding:
-              '10px 22px',
+      {selectedIssue && (
+        <>
+          <div
+            style={{
+              display:
+                'flex',
 
-            borderRadius:
-              '999px',
+              gap:
+                '12px',
 
-            background:
-              '#ffffff',
+              marginBottom:
+                '24px',
 
-            color:
-              '#1a1a2e',
+              flexWrap:
+                'wrap',
 
-            textDecoration:
-              'none',
+              justifyContent:
+                'center'
+            }}
+          >
 
-            fontWeight:
-              '700',
+            <a
+              href={rawSource}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                padding:
+                  '10px 22px',
 
-            fontSize:
-              '14px',
+                borderRadius:
+                  '999px',
 
-            display:
-              'inline-flex',
+                background:
+                  '#8d005f',
 
-            alignItems:
-              'center',
+                color:
+                  '#fff',
 
-            gap:
-              '8px',
+                textDecoration:
+                  'none',
 
-            border:
-              '2px solid #8d005f',
+                fontWeight:
+                  '700',
 
-            boxShadow:
-              '0 4px 14px rgba(0,0,0,0.15)'
-          }}
-        >
-          ⬇ Download PDF
-        </a>
+                fontSize:
+                  '14px',
 
-      </div>
+                display:
+                  'inline-flex',
+
+                alignItems:
+                  'center',
+
+                gap:
+                  '8px',
+
+                boxShadow:
+                  '0 4px 14px rgba(141,0,95,0.35)'
+              }}
+            >
+              ↗ Open in New Tab
+            </a>
 
 
-      <div
-        style={{
-          width:
-            '100%',
+            {selectedIssue.pdf && (
+              <a
+                href={selectedIssue.pdf}
+                download={`${selectedIssue.title.replace(/\s+/g, '-')}.pdf`}
+                style={{
+                  padding:
+                    '10px 22px',
 
-          maxWidth:
-            '960px',
+                  borderRadius:
+                    '999px',
 
-          borderRadius:
-            '16px',
+                  background:
+                    '#ffffff',
 
-          overflow:
-            'hidden',
+                  color:
+                    '#1a1a2e',
 
-          boxShadow:
-            '0 8px 40px rgba(0,0,0,0.5)',
+                  textDecoration:
+                    'none',
 
-          border:
-            '1px solid rgba(255,255,255,0.12)',
+                  fontWeight:
+                    '700',
 
-          background:
-            '#1a1a2e'
-        }}
-      >
+                  fontSize:
+                    '14px',
 
-        <iframe
-          src="/gurukulam-magazine.pdf"
-          title="Gurukulam Magazine"
-          width="100%"
-          height="820px"
-          style={{
-            display:
-              'block',
+                  display:
+                    'inline-flex',
 
-            border:
-              'none'
-          }}
-        />
+                  alignItems:
+                    'center',
 
-      </div>
+                  gap:
+                    '8px',
+
+                  border:
+                    '2px solid #8d005f',
+
+                  boxShadow:
+                    '0 4px 14px rgba(0,0,0,0.15)'
+                }}
+              >
+                ⬇ Download PDF
+              </a>
+            )}
+
+          </div>
+
+
+          <div
+            style={{
+              width:
+                '100%',
+
+              maxWidth:
+                '960px',
+
+              borderRadius:
+                '16px',
+
+              overflow:
+                'hidden',
+
+              boxShadow:
+                '0 8px 40px rgba(0,0,0,0.5)',
+
+              border:
+                '1px solid rgba(255,255,255,0.12)',
+
+              background:
+                '#1a1a2e'
+            }}
+          >
+
+            <iframe
+              src={embedSrc}
+              title={selectedIssue.title}
+              width="100%"
+              height="820px"
+              style={{
+                display:
+                  'block',
+
+                border:
+                  'none'
+              }}
+            />
+
+          </div>
+        </>
+      )}
 
     </div>
 
@@ -1918,6 +2103,11 @@ function App() {
   const socialPostMatch =
     p.match(
       /^\/social\/(\d+)$/
+    );
+
+  const magazinePostMatch =
+    p.match(
+      /^\/magazine\/(\d+)$/
     );
 
 
@@ -2072,7 +2262,8 @@ function App() {
 
 
   else if (
-    p === '/magazine'
+    p === '/magazine' ||
+    magazinePostMatch
   ) {
 
     content =
